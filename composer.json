@@ -1,0 +1,41 @@
+{
+	"name" : "smartsolutionsitaly/cakephp-recaptcha",
+	"description" : "reCAPTCHA component for CakePHP",
+	"keywords" : [
+		"cakephp",
+		"component",
+		"recaptcha",
+		"security",
+		"form"
+	],
+	"type" : "cakephp-plugin",
+	"license" : "MIT",
+	"require-dev" : {
+		"cakephp/cakephp" : "^3.5"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"SmartSolutionsItaly\\ReCaptcha\\" : "src"
+		}
+	},
+	"autoload-dev" : {
+		"psr-4" : {
+			"SmartSolutionsItaly\\ReCaptcha\\Test\\" : "tests",
+			"Cake\\Test\\" : "./vendor/cakephp/cakephp/tests"
+		}
+	},
+	"homepage" : "https://github.com/smartsolutionsitaly/cakephp-recaptcha",
+	"authors" : [{
+			"name" : "Lucio Benini",
+			"email" : "dev@smartsolutions.it",
+			"homepage" : "https://smartsolutions.it",
+			"role" : "Web Developer"
+		}
+	],
+	"support" : {
+		"email" : "info@smartsolutions.it",
+		"issues" : "https://github.com/smartsolutionsitaly/cakephp-recaptcha/issues",
+		"wiki" : "https://github.com/smartsolutionsitaly/cakephp-recaptcha/wiki",
+		"source" : "https://github.com/smartsolutionsitaly/cakephp-recaptcha"
+	}
+}
