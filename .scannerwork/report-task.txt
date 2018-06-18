@@ -1,0 +1,6 @@
+projectKey=cakephp-recaptcha
+serverUrl=http://localhost:9333
+serverVersion=7.1.0.11001
+dashboardUrl=http://localhost:9333/dashboard/index/cakephp-recaptcha
+ceTaskId=AWQTSjv0ODoS9EuGmj0I
+ceTaskUrl=http://localhost:9333/api/ce/task?id=AWQTSjv0ODoS9EuGmj0I

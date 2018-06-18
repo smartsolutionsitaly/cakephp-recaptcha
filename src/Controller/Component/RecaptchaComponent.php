@@ -26,6 +26,7 @@ use Cake\Controller\ComponentRegistry;
 use Cake\Core\Configure;
 use Cake\Event\Event;
 use Cake\Http\Client;
+use Cake\Http\Client\Response;
 
 /**
  * reCAPTCHA component.
@@ -94,6 +95,7 @@ class RecaptchaComponent extends Component
                     'host' => 'www.google.com/recaptcha/api/',
                     'scheme' => 'https'
                 ]);
+                
                 $res = $client->post('/siteverify', [
                     'body' => [
                         'secret' => Configure::read('Google.recaptcha.secretKey'),
@@ -101,25 +103,7 @@ class RecaptchaComponent extends Component
                     ]
                 ]);
                 
-                $code = $res->getStatusCode();
-                
-                if ($code >= 200 && $code < 300) {
-                    $json = json_decode($res->getBody());
-                    
-                    if (! $json->success) {
-                        if ($this->_config['flash']) {
-                            $this->Flash->error(__('Invalid Captcha.'));
-                        }
-                        
-                        $this->_lastResult = false;
-                    }
-                } else {
-                    if ($this->_config['flash']) {
-                        $this->Flash->error(__('Captcha Error.'));
-                    }
-                    
-                    $this->_lastResult = false;
-                }
+                $this->processResponse($res);
             } else {
                 if ($this->_config['flash']) {
                     $this->Flash->error(__('Empty Captcha.'));
@@ -159,6 +143,34 @@ class RecaptchaComponent extends Component
             return in_array($request->getParam('action'), $this->_config['action']);
         } else {
             return $request->getParam('action') == $this->_config['action'];
+        }
+    }
+
+    /**
+     * Processes the response.
+     *
+     * @param Response $response The reCAPTCHA response.
+     */
+    private function processResponse(Response $response)
+    {
+        $code = $response->getStatusCode();
+
+        if ($code >= 200 && $code < 300) {
+            $json = json_decode($response->getBody());
+            
+            if (! $json->success) {
+                if ($this->_config['flash']) {
+                    $this->Flash->error(__('Invalid Captcha.'));
+                }
+                
+                $this->_lastResult = false;
+            }
+        } else {
+            if ($this->_config['flash']) {
+                $this->Flash->error(__('Captcha Error.'));
+            }
+            
+            $this->_lastResult = false;
         }
     }
 }
