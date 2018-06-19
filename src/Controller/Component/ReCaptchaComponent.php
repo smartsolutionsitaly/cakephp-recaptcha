@@ -32,7 +32,7 @@ use Cake\Http\Client\Response;
  * @author Lucio Benini <dev@smartsolutions.it>
  * @since 1.0.0
  */
-class RecaptchaComponent extends Component
+class ReCaptchaComponent extends Component
 {
 
     /**
