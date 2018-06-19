@@ -41,6 +41,7 @@ class RecaptchaComponent extends Component
      * Nested components.
      *
      * @var array
+     * @since 1.0.0
      */
     public $components = [
         'Security',
@@ -51,6 +52,7 @@ class RecaptchaComponent extends Component
      * Validation result.
      *
      * @var bool "True" if the last result was validated; otherwise "False".
+     * @since 1.0.0
      */
     protected $_lastResult = true;
 
@@ -58,6 +60,7 @@ class RecaptchaComponent extends Component
      * Default configuration.
      *
      * @var array
+     * @since 1.0.0
      */
     protected $_defaultConfig = [
         'field' => 'g-recaptcha-response',
@@ -68,7 +71,8 @@ class RecaptchaComponent extends Component
      * Contructor.
      *
      * @param ComponentRegistry $collection            
-     * @param array $config            
+     * @param array $config    
+     * @since 1.0.0        
      */
     public function __construct(ComponentRegistry $collection, $config = [])
     {
@@ -80,6 +84,7 @@ class RecaptchaComponent extends Component
      * {@inheritdoc}
      *
      * @see \Cake\Controller\Controller::beforeFilter()
+     * @since 1.0.0
      */
     public function beforeFilter(Event $event)
     {
@@ -88,19 +93,15 @@ class RecaptchaComponent extends Component
         if ($request->is('post') && $this->isEnabled()) {
             $this->Security->setConfig('unlockedFields', $this->_config['field']);
             
-            $data = $event->getSubject()->request->getData();
-            
-            if (! empty($data[$this->_config['field']])) {
+            if ($data = $request->getData($this->_config['field'])) {
                 $client = new Client([
-                    'host' => 'www.google.com/recaptcha/api/',
+                    'host' => 'www.google.com/recaptcha/api',
                     'scheme' => 'https'
                 ]);
                 
                 $res = $client->post('/siteverify', [
-                    'body' => [
-                        'secret' => Configure::read('Google.recaptcha.secretKey'),
-                        'response' => $data[$this->_config['field']]
-                    ]
+                    'secret' => Configure::read('Google.recaptcha.secretKey'),
+                    'response' => $data
                 ]);
                 
                 $this->processResponse($res);
@@ -124,6 +125,7 @@ class RecaptchaComponent extends Component
      * Gets the last result of the validation.
      *
      * @return bool "True" if the last result was validated; otherwise "False".
+     * @since 1.0.0
      */
     public function getLastResult(): bool
     {
@@ -134,6 +136,7 @@ class RecaptchaComponent extends Component
      * Determines wheter the component is enabled.
      *
      * @return bool "True" if the captcha is enable; otherwise "False".
+     * @since 1.0.0
      */
     protected function isEnabled(): bool
     {
@@ -150,6 +153,7 @@ class RecaptchaComponent extends Component
      * Processes the response.
      *
      * @param Response $response The reCAPTCHA response.
+     * @since 1.0.0
      */
     private function processResponse(Response $response)
     {
