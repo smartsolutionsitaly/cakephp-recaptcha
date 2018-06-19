@@ -15,12 +15,12 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"SmartSolutionsItaly\\ReCaptcha\\" : "src"
+			"SmartSolutionsItaly\\CakePHP\\ReCaptcha\\" : "src"
 		}
 	},
 	"autoload-dev" : {
 		"psr-4" : {
-			"SmartSolutionsItaly\\ReCaptcha\\Test\\" : "tests",
+			"SmartSolutionsItaly\\CakePHP\\ReCaptcha\\Test\\" : "tests",
 			"Cake\\Test\\" : "./vendor/cakephp/cakephp/tests"
 		}
 	},

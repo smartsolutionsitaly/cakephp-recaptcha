@@ -9,8 +9,6 @@
  * For full copyright and license information, please see the LICENSE
  * Redistributions of files must retain the above copyright notice.
  *
- * PHP version 7.1
- *
  * @category  cakephp-plugin
  * @package   cakephp-recaptcha
  * @author    Lucio Benini <dev@smartsolutions.it>
@@ -19,7 +17,7 @@
  * @link      https://smartsolutions.it Smart Solutions
  * @since     1.0.0
  */
-namespace SmartSolutionsItaly\ReCaptcha\Controller\Component;
+namespace SmartSolutionsItaly\CakePHP\ReCaptcha\Controller\Component;
 
 use Cake\Controller\Component;
 use Cake\Controller\ComponentRegistry;
