@@ -148,8 +148,9 @@ class ReCaptchaComponent extends Component
 
     /**
      * Sets lat result as "False" and display a flash message, if enabled.
-     * 
-     * @param string $message The flash message.
+     *
+     * @param string $message
+     *            The flash message.
      */
     protected function error(string $message = '')
     {
@@ -174,7 +175,9 @@ class ReCaptchaComponent extends Component
         if ($code >= 200 && $code < 300) {
             $json = json_decode($response->getBody());
             
-            if (! $json->success) {
+            if ($json->success) {
+                $this->_lastResult = true;
+            } else {
                 $this->error(__('Invalid Captcha.'));
             }
         } else {
