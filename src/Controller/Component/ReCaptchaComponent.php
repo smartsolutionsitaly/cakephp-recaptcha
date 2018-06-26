@@ -20,7 +20,6 @@
 namespace SmartSolutionsItaly\CakePHP\ReCaptcha\Controller\Component;
 
 use Cake\Controller\Component;
-use Cake\Controller\ComponentRegistry;
 use Cake\Core\Configure;
 use Cake\Event\Event;
 use Cake\Http\Client;
@@ -62,19 +61,25 @@ class ReCaptchaComponent extends Component
      */
     protected $_defaultConfig = [
         'field' => 'g-recaptcha-response',
-        'flash' => 'g-recaptcha-response'
+        'flash' => true,
+        'methods' => 'post'
     ];
 
     /**
-     * Contructor.
+     * Initialize config, data and properties.
      *
-     * @param ComponentRegistry $collection            
-     * @param array $config    
-     * @since 1.0.0        
+     * @param array $config
+     *            The config data.
+     * @return void
+     * @since 1.0.5
      */
-    public function __construct(ComponentRegistry $collection, $config = [])
+    public function initialize(array $config)
     {
-        parent::__construct($collection, $config + $this->_defaultConfig);
+        $config = $config + $this->_defaultConfig;
+        
+        $this->setConfig('field', $config['field']);
+        $this->setConfig('flash', (bool) $config['flash']);
+        $this->setConfig('methods', $config['methods']);
     }
 
     /**
@@ -88,10 +93,10 @@ class ReCaptchaComponent extends Component
     {
         $request = $this->getController()->getRequest();
         
-        if ($request->is('post') && $this->isEnabled()) {
-            $this->Security->setConfig('unlockedFields', $this->_config['field']);
+        if ($request->is($this->getConfig('methods')) && $this->isEnabled()) {
+            $this->Security->setConfig('unlockedFields', $this->getConfig('field'));
             
-            if ($data = $request->getData($this->_config['field'])) {
+            if ($data = $request->getData($this->getConfig('field'))) {
                 $client = new Client([
                     'host' => 'www.google.com/recaptcha/api',
                     'scheme' => 'https'
@@ -104,17 +109,11 @@ class ReCaptchaComponent extends Component
                 
                 $this->processResponse($res);
             } else {
-                if ($this->_config['flash']) {
-                    $this->Flash->error(__('Empty Captcha.'));
-                }
-                
-                $this->_lastResult = false;
+                $this->error(__('Empty Captcha.'));
             }
-            
-            return true;
+        } else {
+            $this->_lastResult = true;
         }
-        
-        $this->_lastResult = true;
         
         return true;
     }
@@ -140,39 +139,46 @@ class ReCaptchaComponent extends Component
     {
         $request = $this->getController()->getRequest();
         
-        if (is_array($this->_config['action'])) {
-            return in_array($request->getParam('action'), $this->_config['action']);
+        if (is_array($this->getConfig('action'))) {
+            return in_array($request->getParam('action'), $this->getConfig('action'));
         } else {
-            return $request->getParam('action') == $this->_config['action'];
+            return $request->getParam('action') == $this->getConfig('action');
         }
+    }
+
+    /**
+     * Sets lat result as "False" and display a flash message, if enabled.
+     * 
+     * @param string $message The flash message.
+     */
+    protected function error(string $message = '')
+    {
+        if ($this->getConfig('flash')) {
+            $this->Flash->error($message);
+        }
+        
+        $this->_lastResult = false;
     }
 
     /**
      * Processes the response.
      *
-     * @param Response $response The reCAPTCHA response.
+     * @param Response $response
+     *            The reCAPTCHA response.
      * @since 1.0.0
      */
     private function processResponse(Response $response)
     {
         $code = $response->getStatusCode();
-
+        
         if ($code >= 200 && $code < 300) {
             $json = json_decode($response->getBody());
             
             if (! $json->success) {
-                if ($this->_config['flash']) {
-                    $this->Flash->error(__('Invalid Captcha.'));
-                }
-                
-                $this->_lastResult = false;
+                $this->error(__('Invalid Captcha.'));
             }
         } else {
-            if ($this->_config['flash']) {
-                $this->Flash->error(__('Captcha Error.'));
-            }
-            
-            $this->_lastResult = false;
+            $this->error(__('Captcha Error.'));
         }
     }
 }
