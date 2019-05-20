@@ -17,6 +17,7 @@
  * @link      https://smartsolutions.it Smart Solutions
  * @since     1.0.0
  */
+
 namespace SmartSolutionsItaly\CakePHP\ReCaptcha\Controller\Component;
 
 use Cake\Controller\Component;
@@ -27,16 +28,14 @@ use Cake\Http\Client\Response;
 
 /**
  * reCAPTCHA component.
- *
+ * @package SmartSolutionsItaly\CakePHP\ReCaptcha\Controller\Component
  * @author Lucio Benini <dev@smartsolutions.it>
  * @since 1.0.0
  */
 class ReCaptchaComponent extends Component
 {
-
     /**
      * Nested components.
-     *
      * @var array
      * @since 1.0.0
      */
@@ -47,66 +46,46 @@ class ReCaptchaComponent extends Component
 
     /**
      * Validation result.
-     *
-     * @var bool "True" if the last result was validated; otherwise "False".
+     * @var bool
      * @since 1.0.0
      */
     protected $_lastResult = true;
 
     /**
      * Default configuration.
-     *
      * @var array
      * @since 1.0.0
      */
     protected $_defaultConfig = [
         'field' => 'g-recaptcha-response',
         'flash' => true,
-        'methods' => 'post'
+        'methods' => 'post',
+        'actions' => []
     ];
 
     /**
-     * Initialize config, data and properties.
-     *
-     * @param array $config
-     *            The config data.
-     * @return void
-     * @since 1.0.5
-     */
-    public function initialize(array $config)
-    {
-        $config = $config + $this->_defaultConfig;
-        
-        $this->setConfig('field', $config['field']);
-        $this->setConfig('flash', (bool) $config['flash']);
-        $this->setConfig('methods', $config['methods']);
-    }
-
-    /**
-     *
      * {@inheritdoc}
-     *
      * @see \Cake\Controller\Controller::beforeFilter()
      * @since 1.0.0
      */
     public function beforeFilter(Event $event)
     {
-        $request = $this->getController()->getRequest();
-        
+        $request = $event->getSubject()->getRequest();
+
         if ($request->is($this->getConfig('methods')) && $this->isEnabled()) {
             $this->Security->setConfig('unlockedFields', $this->getConfig('field'));
-            
+
             if ($data = $request->getData($this->getConfig('field'))) {
                 $client = new Client([
                     'host' => 'www.google.com/recaptcha/api',
                     'scheme' => 'https'
                 ]);
-                
+
                 $res = $client->post('/siteverify', [
                     'secret' => Configure::read('Google.recaptcha.secretKey'),
                     'response' => $data
                 ]);
-                
+
                 $this->processResponse($res);
             } else {
                 $this->error(__('Empty Captcha.'));
@@ -114,31 +93,19 @@ class ReCaptchaComponent extends Component
         } else {
             $this->_lastResult = true;
         }
-        
+
         return true;
     }
 
     /**
-     * Gets the last result of the validation.
-     *
-     * @return bool "True" if the last result was validated; otherwise "False".
-     * @since 1.0.0
-     */
-    public function getLastResult(): bool
-    {
-        return (bool) $this->_lastResult;
-    }
-
-    /**
-     * Determines wheter the component is enabled.
-     *
-     * @return bool "True" if the captcha is enable; otherwise "False".
+     * Determines whether the component is enabled.
+     * @return bool A value indicating whether the component is enabled.
      * @since 1.0.0
      */
     protected function isEnabled(): bool
     {
         $request = $this->getController()->getRequest();
-        
+
         if (is_array($this->getConfig('action'))) {
             return in_array($request->getParam('action'), $this->getConfig('action'));
         } else {
@@ -147,34 +114,18 @@ class ReCaptchaComponent extends Component
     }
 
     /**
-     * Sets lat result as "False" and display a flash message, if enabled.
-     *
-     * @param string $message
-     *            The flash message.
-     */
-    protected function error(string $message = '')
-    {
-        if ($this->getConfig('flash')) {
-            $this->Flash->error($message);
-        }
-        
-        $this->_lastResult = false;
-    }
-
-    /**
      * Processes the response.
-     *
-     * @param Response $response
-     *            The reCAPTCHA response.
+     * @param Response $response The reCAPTCHA response.
+     * @return bool The value of the last result.
      * @since 1.0.0
      */
-    private function processResponse(Response $response)
+    private function processResponse(Response $response): bool
     {
         $code = $response->getStatusCode();
-        
+
         if ($code >= 200 && $code < 300) {
             $json = json_decode($response->getBody());
-            
+
             if ($json->success) {
                 $this->_lastResult = true;
             } else {
@@ -183,5 +134,31 @@ class ReCaptchaComponent extends Component
         } else {
             $this->error(__('Captcha Error.'));
         }
+
+        return $this->_lastResult;
+    }
+
+    /**
+     * Sets last result as "False" and display a flash message, if enabled.
+     * @param string $message The flash message.
+     * @return bool The value of the last result. Always returns "False".
+     */
+    protected function error(string $message = ''): bool
+    {
+        if ($this->getConfig('flash') && $message) {
+            $this->Flash->error($message);
+        }
+
+        return $this->_lastResult = false;
+    }
+
+    /**
+     * Gets a value indicating whether the last result has been validated.
+     * @return bool A value indicating whether the last result has been validated.
+     * @since 1.0.0
+     */
+    public function getLastResult(): bool
+    {
+        return (bool)$this->_lastResult;
     }
 }
