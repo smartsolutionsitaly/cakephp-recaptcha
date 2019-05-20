@@ -35,6 +35,25 @@ Plugin::load('SmartSolutionsItaly/CakePHP/ReCaptcha');
 
 at the end of the file.
 
+### Editing Application.php
+
+Edit the `src/Application.php` file and adding
+
+``` php
+$this->addPlugin('SmartSolutionsItaly/CakePHP/ReCaptcha');
+```
+
+in the bootstrap() function.
+
+``` php
+public function bootstrap()
+{
+  parent::bootstrap();
+  
+  $this->addPlugin('SmartSolutionsItaly/CakePHP/ReCaptcha');
+}
+```
+
 ## License
 Licensed under The MIT License
 For full copyright and license information, please see the [LICENSE](LICENSE)
