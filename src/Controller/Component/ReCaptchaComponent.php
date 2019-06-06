@@ -102,7 +102,7 @@ class ReCaptchaComponent extends Component
      * @return bool A value indicating whether the component is enabled.
      * @since 1.0.0
      */
-    protected function isEnabled(): bool
+    public function isEnabled(): bool
     {
         $request = $this->getController()->getRequest();
 
